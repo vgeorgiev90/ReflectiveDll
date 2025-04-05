@@ -29,11 +29,13 @@ Prepare new memory block for the PE's sections and copy them
 ----------------------------------------------------------*/
 LPVOID PreparePEMemory(PPEHDRS pPeHdrs, PWINAPIS pWinAPIs) {
 
+    LPVOID pPEBase;
+    SIZE_T memSize = pPeHdrs->PeSize;
     // Allocate new memory block
-    LPVOID pPEBase = pWinAPIs->fnAlloc(NULL, pPeHdrs->PeSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
-    if (pPEBase == NULL) {
+    if (pWinAPIs->fnAlloc((HANDLE)-1, &pPEBase, 0, &memSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE) != 0x00) {
         return NULL;
     }
+
 
     // Copy all the PE sections to the new block
     for (DWORD z = 0; z < pPeHdrs->pNtHeaders->FileHeader.NumberOfSections; z++) {
@@ -200,7 +202,7 @@ BOOL FixMemProtections(PPEHDRS pPeHdrs, LPVOID pPEBase, PWINAPIS pWinAPIs) {
         // Apply the correct memory protection for the particular section
         secSize = pPeHdrs->pSectHeader[i].SizeOfRawData;
         secAddr = (PBYTE)pPEBase + pPeHdrs->pSectHeader[i].VirtualAddress;
-        if (!pWinAPIs->fnProt(secAddr, secSize, MemProtect, &old)) {
+        if (pWinAPIs->fnProt((HANDLE)-1, &secAddr, &secSize, MemProtect, &old) != 0x00) {
             return FALSE;
         }
     }

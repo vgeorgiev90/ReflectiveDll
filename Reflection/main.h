@@ -12,12 +12,11 @@
 --------------------------*/
 #define K32 0xFD2AD9BD    // KERNEL32.DLL
 #define NTLIB 0x635A68AA  // ntdll.dll 
-#define VA 0x34115EA6     // VirtualAlloc
-#define VP 0x96AC61C9     // VirtualProtect
 #define GP 0xAED18BA0     // GetProcAddress
 #define LLB 0x54C1D227    // LoadLibraryA
 #define FLS 0x3D98C2A1    // NtFlushInstructionCache
-
+#define NTVA 0x6E8AC28E   // NtAllocateVirtualMemory
+#define NTVP 0x1DA5BB2B   // NtProtectVirtualMemory
 
 
 /*---------------------------------------
@@ -33,6 +32,8 @@ extern "C" LPVOID KaynCaller();
 HMODULE GetHand(UINT32 hashLib);
 FARPROC GetAddr(HMODULE hModule, UINT32 ApiHash);
 void MemCpy(LPVOID dst, LPVOID src, size_t size);
+UINT32 HashA(PCHAR String, SIZE_T Length);
+
 
 
 /*--------------------------------------------------

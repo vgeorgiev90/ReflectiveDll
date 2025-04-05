@@ -16,8 +16,7 @@ Two helpers functions are used as a replacement for `GetModuleHandle` and `GetPr
 
 TODO:
 - Update the `GetAddr` function to be able to resolve functions by ordinal as well.
-- At the moment as a quick PoC dynamically resolved `VirtualAlloc` and `VirtualProtect` are being used in the `Load` function. Move to the NT equivelents.
-
+- Move from `LoadLibraryA` to ntdll's `LdrLoadDll`
 
 
 USAGE:

@@ -109,23 +109,11 @@ typedef struct _BASE_RELOCATION_ENTRY {
 /*------------------------------------------
     Custom structs and function signatures
 ------------------------------------------*/
-typedef LPVOID(WINAPI* Alloc_t)(
-    LPVOID lpAddress,
-    SIZE_T dwSize,
-    DWORD  flAllocationType,
-    DWORD  flProtect
-    ); // VirtualAlloc
 
 typedef LPVOID(WINAPI* Load_t)(
     LPCSTR libName
     ); // LoadLibraryA
 
-typedef BOOL(WINAPI* Protect_t)(
-    LPVOID lpAddress,
-    SIZE_T dwSize,
-    DWORD flNewProtect,
-    PDWORD lpflOldProtect
-    ); // VirtualProtect
 
 typedef FARPROC(WINAPI* Getter_t)(
     HMODULE hModule,
@@ -138,6 +126,26 @@ typedef NTSTATUS(NTAPI* Flush_t)(
     PVOID BaseAddress,
     ULONG Length
     ); // NtFlushInstructionCache
+
+
+typedef NTSTATUS(NTAPI* Alloc_t)(
+    HANDLE    ProcessHandle,
+    PVOID* BaseAddress,
+    ULONG_PTR ZeroBits,
+    PSIZE_T   RegionSize,
+    ULONG     AllocationType,
+    ULONG     Protect
+    ); // NtAllocateVirtualMemory
+
+
+typedef NTSTATUS(NTAPI* Protect_t)(
+    HANDLE  ProcessHandle,
+    PVOID* BaseAddress,
+    PSIZE_T RegionSize,
+    ULONG   NewProtect,
+    PULONG  OldProtect
+    ); // NtProtectVirtualMemory
+
 
 
 
