@@ -87,7 +87,7 @@ BOOL FixIAT(PPEHDRS pPeHdrs, LPVOID pPEBase, PWINAPIS pWinAPIs) {
         HMODULE hModule = NULL;
 
         // Load the required DLL
-        hModule = (HMODULE)pWinAPIs->fnLoad(DllName);
+        hModule = Loader(DllName, pWinAPIs);
         if (hModule == NULL) {
             return FALSE;
         }
@@ -105,15 +105,19 @@ BOOL FixIAT(PPEHDRS pPeHdrs, LPVOID pPEBase, PWINAPIS pWinAPIs) {
 
             // if ordinal flag is set get the function's address trough its ordinal, else trough its name
             if (IMAGE_SNAP_BY_ORDINAL(pOrigFirstThunk->u1.Ordinal)) {
-                pFuncAddress = pWinAPIs->Getter(hModule, (LPCSTR)(WORD)IMAGE_ORDINAL(pOrigFirstThunk->u1.Ordinal));
+                pFuncAddress = GetAddr(hModule, (UINT32)IMAGE_ORDINAL(pOrigFirstThunk->u1.Ordinal), pWinAPIs);
             }
             // else get function by name
             else {
                 pImportByName = (PIMAGE_IMPORT_BY_NAME)((PBYTE)pPEBase + pOrigFirstThunk->u1.AddressOfData);
-                pFuncAddress = pWinAPIs->Getter(hModule, pImportByName->Name);
+                pFuncAddress = GetAddr(hModule, HashA(pImportByName->Name, strlen(pImportByName->Name)), pWinAPIs);
             }
+
             // Update the first thunk with the resolved function address
-            pFirstThunk->u1.Function = (ULONGLONG)pFuncAddress;
+            if (pFuncAddress != NULL) {
+                pFirstThunk->u1.Function = (ULONGLONG)pFuncAddress;
+            }
+
             ThunkSize += sizeof(IMAGE_THUNK_DATA);
         }
     }

